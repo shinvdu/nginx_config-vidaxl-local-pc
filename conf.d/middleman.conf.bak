@@ -1,0 +1,27 @@
+server {
+    listen 80;
+    server_name middleman.cc www.middleman.cc;
+    index index.php phpinfo.php;
+
+    root /home/silas/app/middleman;
+
+    location / {
+        if (!-f $request_filename) {
+            rewrite ^(.*)$ /public/index.php?q=$1 last;
+            break;
+        }
+    }
+
+    location ~* ^.+\.(js|ico|gif|jpg|jpeg|pdf|png|css)$ {
+        access_log   off;
+        expires      7d;
+    }
+    location ~ .*\.php?$ {
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+    }
+
+#    error_page  404             http://audit.local/error;
+}
